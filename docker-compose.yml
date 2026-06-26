@@ -2,10 +2,8 @@ services:
   pgsql:
     image: postgres:16
     container_name: zabbix-db
-    environment:
-      - POSTGRES_DB=zabbix
-      - POSTGRES_USER=zabbix
-      - POSTGRES_PASSWORD=zabbix_password
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
@@ -15,11 +13,8 @@ services:
   zabbix-server:
     image: zabbix/zabbix-server-pgsql:latest
     container_name: zabbix-server
-    environment:
-      - DB_SERVER_HOST=pgsql
-      - POSTGRES_DB=zabbix
-      - POSTGRES_USER=zabbix
-      - POSTGRES_PASSWORD=zabbix_password
+    env_file:
+      - .env
     ports:
       - "10051:10051"
     depends_on:
@@ -31,15 +26,8 @@ services:
   zabbix-web:
     image: zabbix/zabbix-web-nginx-pgsql:latest
     container_name: zabbix-web
-    environment:
-      - DB_SERVER_HOST=pgsql
-      - POSTGRES_DB=zabbix
-      - POSTGRES_USER=zabbix
-      - POSTGRES_PASSWORD=zabbix_password
-      - ZBX_SERVER_HOST=zabbix-server
-      - ZBX_SERVER_PORT=10051
-      - PHP_TZ=Asia/Jakarta
-      - ZBX_SERVER_NAME=Zabbix Docker Monitor
+    env_file:
+      - .env
     ports:
       - "8072:8080"
     depends_on:
@@ -53,24 +41,22 @@ services:
   zabbix-agent-docker:
     image: zabbix/zabbix-agent:latest
     container_name: zabbix-agent-docker
-    environment:
-      - ZBX_SERVER_HOST=zabbix-server
-      - ZBX_SERVER_PORT=10051
-      - ZBX_HOSTNAME=docker-monitoring-host
+    env_file:
+      - .env
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro  # ⭐ Mount Docker socket
+      - /var/run/docker.sock:/var/run/docker.sock:ro
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
       - /etc/hostname:/etc/hostname:ro
     ports:
       - "10050:10050"
-    networks:
-      - zabbix-network
     depends_on:
       - zabbix-server
+    networks:
+      - zabbix-network
     restart: always
 
-  # ⭐ DOCKER STATS EXPORTER (untuk detail container)
+  # ⭐ DOCKER STATS EXPORTER
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:latest
     container_name: zabbix-cadvisor
