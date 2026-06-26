@@ -1,0 +1,281 @@
+try {
+
+    var params = JSON.parse(value),
+        req = new HttpRequest();
+
+    // ============================================================
+    // VALIDASI DASAR
+    // ============================================================
+    if (typeof params.url === 'undefined') {
+        throw 'URL Webhook n8n is not defined';
+    }
+
+    req.addHeader('Content-Type: application/json');
+
+    var data;
+
+    var isRecovery = (
+        params.event_status === 'RESOLVED' ||
+        params.event_status === 'OK'
+    );
+
+    var zabbixUrl = params.zabbix_api_url;
+    var sessionToken = params.zabbix_token;
+    var currentTriggerId = params.trigger_id;
+
+    var hostTerdampakList = [];
+
+    // ============================================================
+    // AMBIL HOST TERDAMPAK BERDASARKAN DEPENDENCY
+    // ============================================================
+    if (
+        zabbixUrl &&
+        sessionToken &&
+        currentTriggerId
+    ) {
+
+        try {
+
+            var rpcReq = new HttpRequest();
+
+            rpcReq.addHeader(
+                'Content-Type: application/json-rpc'
+            );
+
+            // ====================================================
+            // ZABBIX API TOKEN (MODERN)
+            // ====================================================
+            rpcReq.addHeader(
+                'Authorization: Bearer ' +
+                sessionToken
+            );
+
+            // ====================================================
+            // FIX LOCALHOST DOCKER
+            // ====================================================
+            if (
+                zabbixUrl.indexOf('localhost') !== -1
+            ) {
+
+                zabbixUrl = zabbixUrl.replace(
+                    'localhost',
+                    '172.18.0.1'
+                );
+            }
+
+            // ====================================================
+            // AMBIL SEMUA TRIGGER + DEPENDENCY
+            // ====================================================
+            var payload = {
+
+                jsonrpc: "2.0",
+
+                method: "trigger.get",
+
+                params: {
+
+                    output: [
+                        "triggerid",
+                        "description"
+                    ],
+
+                    selectHosts: [
+                        "hostid",
+                        "name"
+                    ],
+
+                    selectDependencies: [
+                        "triggerid"
+                    ],
+
+                    monitored: true
+                },
+
+                id: 1
+            };
+
+            var rpcResponse = JSON.parse(
+                rpcReq.post(
+                    zabbixUrl,
+                    JSON.stringify(payload)
+                )
+            );
+
+            // ====================================================
+            // HANDLE ERROR API
+            // ====================================================
+            if (rpcResponse.error) {
+
+                throw (
+                    rpcResponse.error.message +
+                    " : " +
+                    rpcResponse.error.data
+                );
+            }
+
+            // ====================================================
+            // CEK CHILD YANG DEPEND KE PARENT
+            // ====================================================
+            if (rpcResponse.result) {
+
+                rpcResponse.result.forEach(function(trigger){
+
+                    if (
+                        trigger.dependencies &&
+                        trigger.dependencies.length > 0
+                    ) {
+
+                        trigger.dependencies.forEach(function(dep){
+
+                            // =====================================
+                            // FIX TYPE MISMATCH
+                            // =====================================
+                            if (
+                                String(dep.triggerid) ===
+                                String(currentTriggerId)
+                            ) {
+
+                                if (
+                                    trigger.hosts &&
+                                    trigger.hosts.length > 0
+                                ) {
+
+                                    var hostName =
+                                        trigger.hosts[0].name;
+
+                                    // =============================
+                                    // HINDARI DUPLICATE
+                                    // =============================
+                                    if (
+                                        hostName !==
+                                        params.hostname &&
+
+                                        hostTerdampakList.indexOf(
+                                            "- " + hostName
+                                        ) === -1
+                                    ) {
+
+                                        hostTerdampakList.push(
+                                            "- " + hostName
+                                        );
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+        } catch (apiError) {
+
+            hostTerdampakList.push(
+                "Gagal membaca API Zabbix: " +
+                apiError
+            );
+        }
+    }
+
+    // ============================================================
+    // HASIL HOST TERDAMPAK
+    // ============================================================
+    var hasilDampak;
+
+    if (hostTerdampakList.length > 0) {
+
+        hasilDampak = hostTerdampakList.join("\n");
+
+    } else {
+
+        // Jika tidak ada child dependency,
+        // gunakan host yang sedang mengalami problem/recovery
+        hasilDampak = "- " + params.hostname;
+    }
+
+    // ============================================================
+    // PAYLOAD FINAL KE N8N
+    // ============================================================
+    data = {
+
+        hostname: params.hostname,
+
+        ip_address: params.ip_address,
+
+        subject:
+            params.subject ||
+            "Alert Terdeteksi",
+
+        message:
+            params.message ||
+            "Ada perubahan status pada device",
+
+        event_status:
+            params.event_status,
+
+        event_id:
+            params.event_id,
+
+        event_time:
+            params.event_time,
+
+        event_date:
+            params.event_date,
+
+        to:
+            params.To,
+
+        host_terdampak:
+            hasilDampak,
+
+        event_severity:
+            params.event_severity ||
+            "Not classified"
+    };
+
+    // ============================================================
+    // KHUSUS RECOVERY
+    // ============================================================
+    if (isRecovery) {
+
+        data.total_downtime =
+            params.total_downtime || "0m";
+
+        data.anti_dupe_key =
+            params.event_id + "_" +
+            params.event_status;
+
+        data.event_severity =
+        params.event_severity ||
+        "Not classified";
+
+    } else {
+
+        data.event_severity =
+            params.event_severity ||
+            "Not classified";
+    }
+
+    // ============================================================
+    // KIRIM KE N8N
+    // ============================================================
+    var response = req.post(
+        params.url,
+        JSON.stringify(data)
+    );
+
+    if (req.getStatus() !== 200) {
+
+        throw (
+            'Response code dari n8n: ' +
+            req.getStatus()
+        );
+    }
+
+    return 'OK';
+
+} catch (error) {
+
+    return (
+        'Sending failed global catch: ' +
+        error
+    );
+}
