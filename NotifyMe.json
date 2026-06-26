@@ -1,0 +1,1615 @@
+{
+  "name": "NotifyMe",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2a311cdb-d47a-4f0f-9c9a-fb91bb2e0471",
+              "name": "hostname",
+              "value": "={{ $json.body.hostname }}",
+              "type": "string"
+            },
+            {
+              "id": "9864b8da-37eb-4242-93e9-607cc0f205d1",
+              "name": "subject",
+              "value": "={{ $json.body.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "310df604-6ff2-4121-9611-e95a9707cccb",
+              "name": "message",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            },
+            {
+              "id": "068af445-cbc4-4ce1-b2ac-3e29882dfd4d",
+              "name": "event_status",
+              "value": "={{ $json.body.event_status }}",
+              "type": "string"
+            },
+            {
+              "id": "47b7eb44-1d8f-4028-a4c4-4f73986bb699",
+              "name": "event_id",
+              "value": "={{ $json.body.event_id }}",
+              "type": "string"
+            },
+            {
+              "id": "af31ed64-2336-4921-ad20-02fd9f928f94",
+              "name": "event_severity",
+              "value": "={{ $json.body.event_severity }}",
+              "type": "string"
+            },
+            {
+              "id": "04af1eca-5977-4922-a32a-4b506395fa0b",
+              "name": "event_status",
+              "value": "={{ $json.body.event_status }}",
+              "type": "string"
+            },
+            {
+              "id": "6298b8e5-a7ca-4223-bf53-349a155ac859",
+              "name": "event_time",
+              "value": "={{ $json.body.event_time.split(':').map((v, i) => i === 0 ? (parseInt(v) + 7) % 24 : v).join(':') }}",
+              "type": "string"
+            },
+            {
+              "id": "f20cd204-56c2-4c6b-86b7-f79661acdb74",
+              "name": "event_date",
+              "value": "={{ $json.body.event_date.split('.').reverse().join('/') }}",
+              "type": "string"
+            },
+            {
+              "id": "441512ac-4951-446c-8dba-6fbc658343ff",
+              "name": "total_downtime",
+              "value": "={{ $json.body.total_downtime.replace('m', ' menit').replace(/\\s*\\d+s/, '') }}",
+              "type": "string"
+            },
+            {
+              "id": "ef066e99-7fd8-4d4a-8571-556894e2ecae",
+              "name": "host_terdampak",
+              "value": "={{ $json.body.host_terdampak.split('\\n').map(h => h.replace('- ', '')).join(', ') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        80
+      ],
+      "id": "46178873-2b66-4d61-8c82-93d19ec33fb3",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -528,
+        80
+      ],
+      "id": "8e00245c-331c-4d2c-a128-e7b4a65243a1",
+      "name": "Webhook Zabbix",
+      "webhookId": "bfb0d5cc-0b6f-4967-a60e-4e437db6f10a"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f6176933-e4de-40d7-8134-a4832dee5430",
+              "name": "host_terdampak",
+              "value": "={{ $json.host_terdampak.split(',').map(item => item.trim()) }}",
+              "type": "array"
+            },
+            {
+              "id": "5fa7764a-208e-4509-bc7c-c81e00d09406",
+              "name": "event_id",
+              "value": "={{ $json.event_id }}",
+              "type": "number"
+            },
+            {
+              "id": "c2890021-a71b-4a6d-87f3-c9992997af5e",
+              "name": "Problem",
+              "value": "={{ $json.Problem.includes('Unavailable by ICMP ping') || $json.Problem.includes('ICMP ping') ? 'Link Termonitor Down' : $json.Problem }}",
+              "type": "string"
+            },
+            {
+              "id": "015701f2-5585-4a3c-8f85-c2f3249e661e",
+              "name": "event_status",
+              "value": "={{ $('Webhook Whatsapp Gateway').item.json.query.event_status }}",
+              "type": "string"
+            },
+            {
+              "id": "2c40316c-f1e4-4d7c-8726-61caa4a6adf1",
+              "name": "Log Down",
+              "value": "={{ $json['Log Down'] }}",
+              "type": "string"
+            },
+            {
+              "id": "9230173b-3eba-45e8-8fbb-2c919ae7bb0a",
+              "name": "Log Up",
+              "value": "={{ $json['Log Up'] }}",
+              "type": "string"
+            },
+            {
+              "id": "4872e9e8-f42d-4696-92f2-e9b537c55805",
+              "name": "Status Problem",
+              "value": "={{ $json['Status Problem'] }}",
+              "type": "string"
+            },
+            {
+              "id": "8254a87c-e83f-48c8-857b-45938349fcb8",
+              "name": "Status Resolved",
+              "value": "={{ $json['Status Resolved'] }}",
+              "type": "string"
+            },
+            {
+              "id": "6785ee44-3f88-48e5-8c85-17767a79086a",
+              "name": "type",
+              "value": "={{ $('Webhook Whatsapp Gateway').item.json.query.type }}",
+              "type": "string"
+            },
+            {
+              "id": "06e88cf8-35d6-4a87-b16e-41111095f4c4",
+              "name": "total_downtime",
+              "value": "={{ $json['Total Downtime'] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1264,
+        96
+      ],
+      "id": "9f9efcef-d709-40c4-9d86-628e44a63501",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {
+          "reset": true
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2416,
+        -256
+      ],
+      "id": "15fb9230-0dfc-420b-9350-85ac4d27191c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "batchSize": 20,
+        "options": {
+          "reset": true
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2432,
+        96
+      ],
+      "id": "083f6edb-b1ad-4565-946d-e9c3ce165f12",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "path": "=konfirmasi",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        864,
+        96
+      ],
+      "id": "7cd2cfbf-ba3b-404a-8052-2e64731821ba",
+      "name": "Webhook Whatsapp Gateway",
+      "webhookId": "21f6b5d9-6bf4-43b0-bc19-bd5a56f3576f"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "downtime",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "event_id",
+              "lookupValue": "={{ $json.query.event_id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1072,
+        96
+      ],
+      "id": "7d667789-8918-4d1a-86c9-e8c4f2761dde",
+      "name": "Get Data Log Gangguan by Event ID",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "host_terdampak",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        96
+      ],
+      "id": "bc654abf-f609-46ef-a32f-f9c15873215a",
+      "name": "Split Out Data Host Terdampak"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "contact",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "hostname",
+              "lookupValue": "={{ $json.host_terdampak }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1616,
+        96
+      ],
+      "id": "0bd4855f-5426-4de3-88e0-423753ee61dc",
+      "name": "Get Data JID Client",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1824,
+        112
+      ],
+      "id": "f0e50215-d6ba-4771-b367-96a1d66cb9e2",
+      "name": "Merge Data"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ ($json.event_status === 'PROBLEM' && (!$json['Status Problem'] || $json['Status Problem'] === '') && ($json.type === 'client' || $json.type === 'blast')).toString() }}",
+                    "rightValue": "=true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "3108ecd8-f34c-4134-8c63-172422fd9151"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Problem"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "94f41d44-ad35-46ce-9630-adba213d1560",
+                    "leftValue": "={{ ($json.event_status === 'RESOLVED' && (!$json['Status Resolved'] || $json['Status Resolved'] === '') && ($json.type === 'client' || $json.type === 'blast' || $json.type === 'recovery')).toString() }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Send Recovery"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5a251a04-c381-4dab-85cf-ddb712e2e9cb",
+                    "leftValue": "={{ ($json.event_status === 'PROBLEM' && $json['Status Problem'] && $json['Status Problem'] !== '').toString() }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Dont Send Problem"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4b9dec8d-c1ae-4dae-82f0-907a15a8c4be",
+                    "leftValue": "={{ ($json.event_status === 'RESOLVED' && (($json['Status Resolved'] && $json['Status Resolved'] !== '') || ($json['Log Up'] && $json['Log Up'] !== ''))).toString() }}",
+                    "rightValue": "true",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Dont Send Recovery"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        2048,
+        80
+      ],
+      "id": "b91c2e70-b770-40a9-9c6b-923a8095cbd7",
+      "name": "Switch : Send Notification Client"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/send/message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"phone\": \"{{ $json.jid }}\",\n  \"message\": \"{$json}\",\n  \"is_forwarded\": false\n} ",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.jid }}"
+            },
+            {
+              "name": "message",
+              "value": "=*Notifikasi Gangguan Layanan*\n\nYth. Bapak/Ibu Tim {{ $json.client }},\n\nKami menginformasikan bahwa sistem monitoring kami mendeteksi adanya kendala teknis pada layanan Anda:\n\n📍 *Site/Layanan : {{ $json.hostname }}*\n⚠️ *Detail Masalah: {{ $json.Problem }}*\n⏰ *Waktu Terdeteksi: {{ $json['Log Down'] }}*\n\nMohon bantuan konfirmasinya terkait status kelistrikan dan kondisi lampu indikator perangkat di lokasi saat ini bagaimana, Bapak/Ibu? \n\nSaat ini kami juga sedang melakukan pengecekan paralel dari sisi hulu. Terima kasih.\n\n-*CS PT.SKYLINE*-"
+            },
+            {
+              "name": "is_forwarded",
+              "value": "={{false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2672,
+        -192
+      ],
+      "id": "794ff7e0-6a70-4cb2-a3dd-7404d4063736",
+      "name": "WA gateway Send Problem Notification",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EtU7sCU7Z2BSjjwd",
+          "name": "Unnamed credential 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/send/message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"phone\": \"{{ $json.jid }}\",\n  \"message\": \"{$json}\",\n  \"is_forwarded\": false\n} ",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $json.jid }}"
+            },
+            {
+              "name": "message",
+              "value": "=\n*Notifikasi Pemulihan Pelayanan*\n\nYth.Bapak/Ibu Tim {{ $json.client }},\n\nKami menginformasikan bahwa kendala teknis pada layanan Anda telah berhasil diatasi dan status kembali normal:\n\n📍 *Site/Layanan :{{ $json.hostname }}*\n⚠️ *Status: NORMAL / RECOVERED*\n⏰ *Waktu Downtime : {{ $json['Log Down'] }} - {{ $json['Log Up'] }}*\n\nMohon kesediaan Bapak/Ibu untuk melakukan pengujian koneksi kembali di lokasi. Secara paralel, link tetap kami monitor untuk memastikan kestabilannya. \n\nTerima kasih atas koordinasi dan kerja samanya yang baik.\n\n*-CS PT.SKYLINE-*"
+            },
+            {
+              "name": "is_forwarded",
+              "value": "={{false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2672,
+        192
+      ],
+      "id": "45b50315-7b26-4f7e-83fa-e1daa9e01c6e",
+      "name": "WA Gateway Send Recovery Notification",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EtU7sCU7Z2BSjjwd",
+          "name": "Unnamed credential 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "downtime",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event_id": "={{ $('Loop Over Items').item.json.event_id }}",
+            "Status Problem": "Send (V)"
+          },
+          "matchingColumns": [
+            "event_id"
+          ],
+          "schema": [
+            {
+              "id": "hostname",
+              "displayName": "hostname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "host_terdampak",
+              "displayName": "host_terdampak",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Problem",
+              "displayName": "Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Down",
+              "displayName": "Log Down",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Up",
+              "displayName": "Log Up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Downtime",
+              "displayName": "Total Downtime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Problem",
+              "displayName": "Status Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status Resolved",
+              "displayName": "Status Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2832,
+        -192
+      ],
+      "id": "2e42e48a-0c4f-4211-a0c3-cf956fd1cc68",
+      "name": "Update row in Status Problem Send (V)",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "downtime",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event_id": "={{ $('Switch : Send Notification Client').item.json.event_id }}",
+            "Status Resolved": "Send (V)"
+          },
+          "matchingColumns": [
+            "event_id"
+          ],
+          "schema": [
+            {
+              "id": "hostname",
+              "displayName": "hostname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Problem",
+              "displayName": "Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Down",
+              "displayName": "Log Down",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Up",
+              "displayName": "Log Up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Downtime",
+              "displayName": "Total Downtime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Problem",
+              "displayName": "Status Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Resolved",
+              "displayName": "Status Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2896,
+        192
+      ],
+      "id": "f074c904-644a-447c-b51d-a61f6be3df84",
+      "name": "Update row in Status Recovery Send (V)",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/send/message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"phone\": \"120363405777913818@g.us\",\n  \"message\": \"{$json}\",\n  \"is_forwarded\": false\n}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "120363405777913818@g.us"
+            },
+            {
+              "name": "message",
+              "value": "=🚨 ZABBIX ALERTS 🚨\n\nStatus        : *{{ $json.event_status }}*\nSeverity      : {{ $json.event_severity }}\nHost           : {{ $json.hostname }}\nIssue          : {{ $json.message }}\nEvent Id     : {{ $json.event_id }}\nTime          : {{ $json.event_date }} {{ $json.event_time }}\nList Problem : https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=1655584965#gid=1655584965\n\n\n💡 Klik link dibawah untuk info ke customer, Jika tidak abaikan !\nhttp://femmy.tail7dee42.ts.net:5678/webhook/konfirmasi?type=client&event_status={{ $json.event_status }}&event_id={{ $json.event_id }}&host={{ $json.hostname }}"
+            },
+            {
+              "name": "is_forwarded",
+              "value": "={{false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        -192
+      ],
+      "id": "3395cc26-5996-4108-b9c1-e7453f59674d",
+      "name": "WA Gateway Send Whatsapp Grup (Client)",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EtU7sCU7Z2BSjjwd",
+          "name": "Unnamed credential 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/send/message",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"phone\": \"120363405777913818@g.us\",\n  \"message\": \"{$json}\",\n  \"is_forwarded\": false\n}",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "120363405777913818@g.us"
+            },
+            {
+              "name": "message",
+              "value": "=🚨 ZABBIX ALERTS 🚨\n\nStatus        : *{{ $json.event_status }}*\nSeverity      : {{ $json.event_severity }}\nHost           : {{ $json.hostname }}\nAffected client : {{ $json.host_terdampak }}\nIssue          : {{ $json.message }}\nEvent Id     : {{ $json.event_id }}\nTime          : {{ $json.event_date }} {{ $json.event_time }}\nList Problem : https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=1655584965#gid=1655584965\n\n\n💡 Klik link dibawah untuk info ke customer, Jika tidak abaikan !\nhttp://femmy.tail7dee42.ts.net:5678/webhook/konfirmasi?type=blast&event_status={{ $json.event_status }}&event_id={{ $json.event_id }}&host={{ $json.hostname }}"
+            },
+            {
+              "name": "is_forwarded",
+              "value": "={{false }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        240,
+        0
+      ],
+      "id": "d430f761-95c7-48ce-a047-f90694c1f899",
+      "name": "WA Gateway Send Whatsapp Grup (Blast)",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "EtU7sCU7Z2BSjjwd",
+          "name": "Unnamed credential 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "downtime",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event_id": "={{ $('Switch : Severity Level').item.json.event_id }}",
+            "Problem": "={{ $('Switch : Severity Level').item.json.message }}",
+            "Log Down": "={{ $('Edit Fields').item.json.event_date }} {{ $('Edit Fields').item.json.event_time }}",
+            "hostname": "={{ $('Switch : Severity Level').item.json.hostname }}",
+            "host_terdampak": "={{ $('Edit Fields').item.json.host_terdampak }}"
+          },
+          "matchingColumns": [
+            "event_id"
+          ],
+          "schema": [
+            {
+              "id": "hostname",
+              "displayName": "hostname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "host_terdampak",
+              "displayName": "host_terdampak",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Problem",
+              "displayName": "Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Log Down",
+              "displayName": "Log Down",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Log Up",
+              "displayName": "Log Up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Total Downtime",
+              "displayName": "Total Downtime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Problem",
+              "displayName": "Status Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Resolved",
+              "displayName": "Status Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        208
+      ],
+      "id": "a06f3927-3b94-4780-8c65-e3fde5f6163a",
+      "name": "Simpan Log Gangguan",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=✅ BERHASIL! \nKonfirmasi untuk host {{ $('Get Data Log Gangguan by Event ID').item.json.host_terdampak }} telah diproses.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2416,
+        432
+      ],
+      "id": "1dccfccd-a073-43ef-98ff-181d0b175469",
+      "name": "Respond to Webhook WA Gateway"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.event_severity }}",
+                    "rightValue": "Average|High",
+                    "operator": {
+                      "type": "string",
+                      "operation": "regex"
+                    },
+                    "id": "91814d03-51e7-477a-9049-2d68da4c5b96"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Minor"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2adddee0-915c-4a0d-adc6-9a4693ca7c6f",
+                    "leftValue": "={{ $json.event_severity }}",
+                    "rightValue": "Disaster",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Masif"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8d6787c9-8ded-49fd-a42b-515258b298d7",
+                    "leftValue": "={{ $json.event_status }}",
+                    "rightValue": "PROBLEM",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "update problem"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d44eb375-aa95-4186-81ef-29417ae3520a",
+                    "leftValue": "={{ $json.event_status }}",
+                    "rightValue": "RESOLVED",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "update resolved"
+            }
+          ]
+        },
+        "options": {
+          "allMatchingOutputs": true
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        48
+      ],
+      "id": "b2b5e7b2-0dd7-45b5-840b-4157a968949d",
+      "name": "Switch : Severity Level"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=✅ BERHASIL! \nKonfirmasi untuk host {{ $('Get Data Log Gangguan by Event ID').item.json.host_terdampak }} telah diproses.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2720,
+        -368
+      ],
+      "id": "d9269a23-94cc-40a6-8d2d-7ce163e8fb3c",
+      "name": "Respond to Webhook WA Gateway1"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=✅ BERHASIL! \nKonfirmasi untuk host {{ $('Get Data Log Gangguan by Event ID').item.json.host_terdampak }} telah diproses.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        2688,
+        32
+      ],
+      "id": "eccfce63-5a3e-4c3a-9303-c2cd0ad3f099",
+      "name": "Respond to Webhook WA Gateway2"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "https://docs.google.com/spreadsheets/d/16Gmr06s9N6Hu1dzHaQJheK9Uxui86vLt8WhZWXPtjkI/edit?gid=0#gid=0",
+          "mode": "url"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "downtime",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "event_id": "={{ $('Edit Fields').item.json.event_id }}",
+            "Total Downtime": "={{ $('Edit Fields').item.json.total_downtime }}",
+            "Log Up": "={{ $('Edit Fields').item.json.event_date }}{{ $('Edit Fields').item.json.event_time }}"
+          },
+          "matchingColumns": [
+            "event_id"
+          ],
+          "schema": [
+            {
+              "id": "hostname",
+              "displayName": "hostname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "host_terdampak",
+              "displayName": "host_terdampak",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "event_id",
+              "displayName": "event_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Problem",
+              "displayName": "Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Down",
+              "displayName": "Log Down",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Log Up",
+              "displayName": "Log Up",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Total Downtime",
+              "displayName": "Total Downtime",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status Problem",
+              "displayName": "Status Problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status Resolved",
+              "displayName": "Status Resolved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        240,
+        400
+      ],
+      "id": "e23bdd37-a7bc-4976-a986-edfa9df2fdd7",
+      "name": "Simpan Log Pemulihan",
+      "credentials": {
+        "googleApi": {
+          "id": "fvyhljMsEDZWNbZs",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Get Data Log Gangguan by Event ID": [
+      {
+        "json": {
+          "row_number": 3,
+          "hostname": "Mikrotik-Core-RO",
+          "host_terdampak": "Client-A, Client-B",
+          "event_id": 4645,
+          "Problem": "MikroTik: Unavailable by ICMP ping",
+          "Log Down": "03/06/2026 13:43:27",
+          "Log Up": "03/06/202613:43:27",
+          "Total Downtime": "8 menit",
+          "Status Problem": "Send (V)",
+          "Status Resolved": ""
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Switch : Severity Level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Zabbix": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Split Out Data Host Terdampak",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook WA Gateway1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WA gateway Send Problem Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook WA Gateway2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WA Gateway Send Recovery Notification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook Whatsapp Gateway": {
+      "main": [
+        [
+          {
+            "node": "Get Data Log Gangguan by Event ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data Log Gangguan by Event ID": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out Data Host Terdampak": {
+      "main": [
+        [
+          {
+            "node": "Get Data JID Client",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Data JID Client": {
+      "main": [
+        [
+          {
+            "node": "Merge Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Data": {
+      "main": [
+        [
+          {
+            "node": "Switch : Send Notification Client",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch : Send Notification Client": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook WA Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook WA Gateway",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA gateway Send Problem Notification": {
+      "main": [
+        [
+          {
+            "node": "Update row in Status Problem Send (V)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WA Gateway Send Recovery Notification": {
+      "main": [
+        [
+          {
+            "node": "Update row in Status Recovery Send (V)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in Status Problem Send (V)": {
+      "main": [
+        []
+      ]
+    },
+    "Update row in Status Recovery Send (V)": {
+      "main": [
+        []
+      ]
+    },
+    "WA Gateway Send Whatsapp Grup (Client)": {
+      "main": [
+        []
+      ]
+    },
+    "WA Gateway Send Whatsapp Grup (Blast)": {
+      "main": [
+        []
+      ]
+    },
+    "Simpan Log Gangguan": {
+      "main": [
+        []
+      ]
+    },
+    "Switch : Severity Level": {
+      "main": [
+        [
+          {
+            "node": "WA Gateway Send Whatsapp Grup (Client)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "WA Gateway Send Whatsapp Grup (Blast)",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Simpan Log Gangguan",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Simpan Log Pemulihan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "1086e51a-1ea7-4f58-9e84-3ce25f894876",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2dfaf158d483caba3df8e4df1c949e28e80d9c575fbee242e17dddc0cecc1715"
+  },
+  "id": "OSCxeKWRxZDucqID",
+  "tags": []
+}
